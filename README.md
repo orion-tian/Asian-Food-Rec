@@ -20,37 +20,29 @@ You will use this template to directly deploy your Flask code on the project ser
 
 After you follow the steps below, you should have set up a public address dedicated to your team's project at (for the moment) a template app will be running.  In future milestones you will be updating the code to replace that template with your very own app.
 
-For the initial setup, only one member of your team needs to follow the steps below.
-
-## Authentication and Login
-
-To start your deployment, one of your teammates will have to go this URL: http://4300showcase.infosci.cornell.edu:9090/#/login
-
-To access the dashboard above, you will need an account and password to sign in, which if you're part of the course will be created for you. Each team will share one account, so any changes made by one teammate will reflect for everyone.
-
-The application uses JWT to track your status and activity, so clearing localStorage could cause issues, in which case you will have to login again.
-
-## Working with the template
-
-You can clone a copy of this repository directly and use it, or you can use the create template option that has been provided to you. Either way, you can put the repository on Cornell GitHub with the constraint that it has to be **PUBLIC**.  
 
 ## Deploying on the server 
 
-### Step 1: Login and basic setup
+For the initial deployment, only one member of your team needs to follow the steps below.
 
-- Login to the dashboard at http://4300showcase.infosci.cornell.edu:9090/#/login using your provided account name and password
+
+### Step 0: Forking this template
+
+- You should make a FORK of this repository on (regular) GitHub, make sure that your fork is PUBLIC.  Keep in mind that other students will be able to see your repository.
+
+### Step 1: Login to the deployment dashboard
+
+- Login to the dashboard at http://4300showcase.infosci.cornell.edu:9090/#/login using your provided account name and password;  each team will be provided a joint account, so any changes made by one teammate will reflect for everyone.
 - When you login, ensure your dashboard has the following data filled from the image below (check the black arrows only)
-  - The GitHub URL will not be filled in for you, so you should add in the URL of your cloned repository.
-- Clicking the URL should re-direct you, but since no deployments will be active, you will receive a connection refused- Your allocated port indicates on which port your flask service will be deployed
+  - The GitHub URL field will not be filled in for you, so you should add in the URL of your forked repository.
 
 ![4300showcase infosci cornell edu_9090_ (1)](https://user-images.githubusercontent.com/55399795/223569113-e820125e-29ff-4baa-8a01-3abf22668180.png)
 
 
 ### Step 2: Understanding the interface
-- **CLONE**: First time clone from GitHub, this is to load your files on the server. In future, when you push updates, clone will re-downloaded your new files onto the server. It is imperative that you re-clone before building.
 
+- **CLONE**: First time clone from GitHub onto the server, this is to load your files on the server. In future, when you push updates, clone will re-downloaded your new files onto the server. It is imperative that you re-clone before building.
 - **BUILD**: Will re-clone and build everything from your GitHub repo, and only from the master/main branch. This is a hard reset, however, your data will be preserved. This includes all data from your database and tables. 
-
 - **START**: Containers not in use will typically be turned off. To reboot these containers **WITHOUT REBUILDING**, use this button. This will restart your code in the exact same state as you left it, and will not clone or pull any new changes or tamper with data.
 - **STOP**: Will stop containers, but not delete them. STOP just turns off your container.
 - **DESTROY**: Will destroy all your containers as well as remove any data associated with them. Useful for fresh boot from scratch
@@ -59,16 +51,18 @@ You can clone a copy of this repository directly and use it, or you can use the 
 
 ### Step 3: Test deployment
 
-- Back at the dashboard, in the provided search bar, add the URL of your template from your repository
+- On the dashboard, in the provided search bar, add the URL of your forked repository
 - Click the **clone** button and wait for a bit till you get a confirmation
 - Click **build**, and wait for a minute. If all goes successfully, hitting the refresh button on the Container Information table and the logs tab will show the created data from the service. If this doesn't work, logout and log back in.
-- Your URL should now work and display a simple episode-searching app
+- Now, clicking on the URL button should lead you to a simple episode-searching app
 - If it doesn't load initially, give it a few seconds and reload.
 - This should be the screen you see. Test it out
 
 ![image](https://user-images.githubusercontent.com/55399795/224594465-e317dd02-7519-4fd7-aaca-32457650ce36.png)
 
 ## Running locally
+
+This is not formally a requirement of P01.  This is to help you test and develop your app locally; we recommend each member of the team to try this out. 
 
 ### Step 1: Set up MySQL
 You will need to install MySQL. Here are two tutorials that could help you with the process:
