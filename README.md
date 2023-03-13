@@ -16,13 +16,15 @@
 
 This is a template for **"CS/INFO 4300 class at Cornell University"**
 
-You will use this template to directly add your Flask code, whose deployment you can control from http://4300showcase.infosci.cornell.edu:9090/#/login. 
-
-For the initial setup, you only need one of your teammates to sign in and do it. 
+You will use this template to directly deploy your Flask code on the project server.
 
 After you follow the steps below, you should have set up a public address dedicated to your team's project at (for the moment) a template app will be running.  In future milestones you will be updating the code to replace that template with your very own app.
 
+For the initial setup, only one member of your team needs to follow the steps below.
+
 ## Authentication and Login
+
+To start your deployment, one of your teammates will have to go this URL: http://4300showcase.infosci.cornell.edu:9090/#/login
 
 To access the dashboard above, you will need an account and password to sign in, which if you're part of the course will be created for you. Each team will share one account, so any changes made by one teammate will reflect for everyone.
 
