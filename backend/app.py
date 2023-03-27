@@ -36,57 +36,50 @@ def sql_search(episode):
     return json.dumps([dict(zip(keys,i)) for i in data])
 
 def boolean_search(ingred_lst, query_lst):
-    query_sql = f"""SELECT * FROM mytable"""
-    data = mysql_engine.query_selector(query_sql)
+    ingred_postings = []
+    for ingred in ingred_lst:
+        mysql_engine.query_selector(f"""USE recipes""")
+        query_sql = f"""SELECT posting FROM inverted_index WHERE ingredient = '{ingred.lower()}' """ 
+        data = mysql_engine.query_selector(query_sql)
+        
+        posting_set = set()
+        data = [str(i) for i in data]
+        for tuple in data:
+            tuple = tuple[3:len(tuple)-4]
+            for p in tuple.split(','):
+                posting_set.add(p.strip())
+
+        ingred_postings.append(posting_set)
+
+        # print(ingred_postings)
+
+    #perform boolean and on all postings
+    result_postings = ingred_postings[0]
+    for i in range(1, len(ingred_postings)):
+        curr = ingred_postings[i]
+        result_postings = curr.intersection(result_postings)
+    # print(result_postings)
 
     result = []
-    keys = ["name","id","minutes", "contributor_id", "submitted", "tags", "nutrition", 
-                "n_steps", "steps", "description", "ingredients", "n_ingredients"]
-    # since I was tyring to do the dumbest way of looking through every row
-    # of table and checking if the recipe's ingredients was subset of inputted ingredients
-    # then add recipe to result list
-    for row in data:
-        data_dict = dict(zip(keys,row))
-        print(data_dict)
-        print()
-        # recipe_ingred_lst = []
-        # ingred_lst_str = data_dict['ingredients'].strip()
-        # ingred_lst_str = ingred_lst_str[1:len(ingred_lst_str)-1]
-        # for i in ingred_lst_str.split(','):
-        #     ingred = i.strip()
-        #     ingred = ingred[1:len(ingred)-1]
-        #     # print(ingred)
-        #     recipe_ingred_lst.append(ingred)
+    keys = ['name', 'minutes', 'tags', 'nutrition', 'steps', 'description', 'ingredients']
+    
+    for p in result_postings:
+        mysql_engine.query_selector(f"""USE recipes""")
+        query_sql = f"""SELECT name, minutes, tags, nutrition, steps, description, ingredients FROM mytable WHERE id = '{p}' """ 
+        data = mysql_engine.query_selector(query_sql)
+        for i in data:
+            result.append(dict(zip(keys,i)))
 
-        # print(recipe_ingred_lst)
-        # print()
-        # if set(recipe_ingred_lst).issubset(set(ingred_lst)):
-        #     result.append((data_dict['name'], data_dict['id'], data_dict['ingredients']))
-
-    # return result
-    return []
+    return result
 
 def sql_recipe_search(ingred_lst_str):
     ingred_lst = []
     for ingred in ingred_lst_str.split(','):
         ingred_lst.append(ingred.strip())
     
-    recipe_ids = boolean_search(ingred_lst, [])
-
-    # print(recipe_ids)
-   
-    # keys = ["name","id","minutes", "contributor_id"]
-    # for recipe_id in recipe_ids:
-    #     query_sql = f"""SELECT * FROM mytable WHERE id = '%%{recipe_id}%%'"""
-    #     data.append(mysql_engine.query_selector(query_sql))
-    
-    
-    query_sql = f"""SELECT * FROM mytable WHERE LOWER( name ) LIKE '%%{ingred_lst_str.lower()}%%' limit 10"""
-    # keys = ["name","id","minutes", "contributor_id", "submitted", "tags", "nutrition", 
-        #         "n_steps", "steps", "description", "ingredients", "n_ingredients"]
-    keys = ["name","id","minutes", "contributor_id"]
-    data = mysql_engine.query_selector(query_sql)
-    return json.dumps([dict(zip(keys,i)) for i in data])
+    recipes = boolean_search(ingred_lst, [])
+    print(recipes)
+    return json.dumps(recipes)
 
 
 @app.route("/")

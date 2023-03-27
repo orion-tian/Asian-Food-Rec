@@ -37,9 +37,11 @@ with open('ingredients_inverted_index.pickle', 'wb') as f:
     pickle.dump(inv_idx, f)
 
 # save the inverted index as a csv file
-w = csv.writer(open("ingredients_inverted_index.csv", "w"))
-w.writerow(['ingredients', 'posting'])
-for key, val in create_inv_idx().items():
-    w.writerow([key, val])
+df = pd.DataFrame(list(inv_idx.items()),columns = ['ingredient','posting'])
+df.to_csv('ingredients_inverted_index.csv', index=False)
+# w = csv.writer(open("ingredients_inverted_index.csv", "w"))
+# w.writerow(['ingredients', 'posting'])
+# for key, val in create_inv_idx().items():
+#     w.writerow([key, val])
 
 
