@@ -152,7 +152,7 @@ def home():
 #     text = request.args.get("title")
 #     return sql_recipe_search(text)
 
-@app.route("/recipes", methods=['GET'])
+@app.route("/recipes", methods=['POST'])
 def recipes_search():
     body = request.json
     query = body['query']  # string - this is the freeform query
