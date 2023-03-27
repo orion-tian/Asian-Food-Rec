@@ -62,11 +62,11 @@ def boolean_search(ingred_lst, query_lst):
     # print(result_postings)
 
     result = []
-    keys = ['name', 'minutes', 'tags', 'nutrition', 'steps', 'description', 'ingredients']
+    keys = ['name', 'id', 'minutes', 'tags', 'nutrition', 'steps', 'description', 'ingredients']
     
     for p in result_postings:
         mysql_engine.query_selector(f"""USE recipes""")
-        query_sql = f"""SELECT name, minutes, tags, nutrition, steps, description, ingredients FROM mytable WHERE id = '{p}' """ 
+        query_sql = f"""SELECT name, id, minutes, tags, nutrition, steps, description, ingredients FROM mytable WHERE id = '{p}' """ 
         data = mysql_engine.query_selector(query_sql)
         for i in data:
             result.append(dict(zip(keys,i)))
@@ -116,11 +116,11 @@ def subset_search(ingred_lst):
 
     
     result = []
-    keys = ['name', 'minutes', 'tags', 'nutrition', 'steps', 'description', 'ingredients']
+    keys = ['name', 'id', 'minutes', 'tags', 'nutrition', 'steps', 'description', 'ingredients']
     
     for p in diff:
         mysql_engine.query_selector(f"""USE recipes""")
-        query_sql = f"""SELECT name, minutes, tags, nutrition, steps, description, ingredients FROM mytable WHERE id = '{p}' """ 
+        query_sql = f"""SELECT name, id, minutes, tags, nutrition, steps, description, ingredients FROM mytable WHERE id = '{p}' """ 
         data = mysql_engine.query_selector(query_sql)
         for i in data:
             result.append(dict(zip(keys,i)))
