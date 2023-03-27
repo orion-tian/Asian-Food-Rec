@@ -169,4 +169,4 @@ def recipes_search():
 
     return json.dumps(ranked)
 
-app.run(debug=True)
+# app.run(debug=True)
