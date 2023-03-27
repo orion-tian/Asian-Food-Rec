@@ -78,7 +78,7 @@ def sql_recipe_search(ingred_lst_str):
         ingred_lst.append(ingred.strip())
     
     recipes = boolean_search(ingred_lst, [])
-    print(recipes)
+
     return json.dumps(recipes)
 
 
@@ -91,9 +91,19 @@ def home():
 #     text = request.args.get("title")
 #     return sql_search(text)
 
-@app.route("/recipes")
-def episodes_search():
-    text = request.args.get("title")
-    return sql_recipe_search(text)
 
-# app.run(debug=True)
+# @app.route("/recipes")
+# def episodes_search():
+#     text = request.args.get("title")
+#     return sql_recipe_search(text)
+
+@app.route("/recipes", methods=['GET'])
+def recipes_search():
+    body = request.json
+    query = body['query']  # string - this is the freeform query
+    pantry = body['pantry']  # string list - this is the list of ingredients
+
+    # Output is a list of dicts on information about each recipe (jsonified)
+    return json.dumps(boolean_search(pantry, query))
+
+app.run(debug=True)
