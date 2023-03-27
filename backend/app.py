@@ -16,7 +16,7 @@ os.environ['ROOT_PATH'] = os.path.abspath(os.path.join("..",os.curdir))
 MYSQL_USER = "root"
 MYSQL_USER_PASSWORD = ""
 MYSQL_PORT = 3306
-MYSQL_DATABASE = "kardashiandb"
+MYSQL_DATABASE = "recipes"
 
 mysql_engine = MySQLDatabaseHandler(MYSQL_USER,MYSQL_USER_PASSWORD,MYSQL_PORT,MYSQL_DATABASE)
 
@@ -78,7 +78,7 @@ def sql_recipe_search(ingred_lst_str):
         ingred_lst.append(ingred.strip())
     
     recipes = boolean_search(ingred_lst, [])
-    print(recipes)
+
     return json.dumps(recipes)
 
 
@@ -97,18 +97,13 @@ def home():
 #     text = request.args.get("title")
 #     return sql_recipe_search(text)
 
-
 @app.route("/recipes", methods=['GET'])
 def recipes_search():
     body = request.json
     query = body['query']  # string - this is the freeform query
     pantry = body['pantry']  # string list - this is the list of ingredients
 
-    # do something
-    idk = sql_recipe_search(query)
-
-    # Output should be a list of recipes (jsonified)
-    return idk
-
+    # Output is a list of dicts on information about each recipe (jsonified)
+    return json.dumps(boolean_search(pantry, query))
 
 app.run(debug=True)
