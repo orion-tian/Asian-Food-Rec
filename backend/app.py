@@ -2,6 +2,7 @@ import json
 import os
 from flask import Flask, render_template, request
 from flask_cors import CORS
+from jaccard import jaccard_similarity
 from helpers.MySQLDatabaseHandler import MySQLDatabaseHandler
 # import boolean_search
 import pickle
@@ -72,6 +73,60 @@ def boolean_search(ingred_lst, query_lst):
 
     return result
 
+def subset_search(ingred_lst):
+    mysql_engine.query_select(f"""USE recipes""")
+    query_sql = f"""SELECT ingredient from inverted_index WHERE ingredient NOT IN {repr(tuple(map(str, ingred_lst)))}"""
+    data = mysql_engine.query_selector(query_sql)
+    not_ingred_lst = [str(i) for i in data]
+
+    all_posting_set = set()
+
+    mysql_engine.query_selector(f"""USE recipes""")
+    query_sql = f"""SELECT posting FROM inverted_index""" 
+    data = mysql_engine.query_selector(query_sql)
+    data = [str(i) for i in data]
+    for tuple in data:
+        tuple = tuple[3:len(tuple)-4]
+        for p in tuple.split(','):
+            all_posting_set.add(p.strip())
+    
+    not_ingred_postings = []
+
+    for ingred in not_ingred_lst:
+        mysql_engine.query_selector(f"""USE recipes""")
+        query_sql = f"""SELECT posting FROM inverted_index WHERE ingredient = '{ingred.lower()}' """ 
+        data = mysql_engine.query_selector(query_sql)
+        
+        posting_set = set()
+        data = [str(i) for i in data]
+        for tuple in data:
+            tuple = tuple[3:len(tuple)-4]
+            for p in tuple.split(','):
+                posting_set.add(p.strip())
+
+        not_ingred_postings.append(posting_set)
+
+    #perform boolean or on all postings
+    result_postings = not_ingred_postings[0]
+    for i in range(1, len(not_ingred_postings)):
+        curr = not_ingred_postings[i]
+        result_postings = curr.union(result_postings)
+
+    diff = all_posting_set.difference(result_postings)
+
+    
+    result = []
+    keys = ['name', 'minutes', 'tags', 'nutrition', 'steps', 'description', 'ingredients']
+    
+    for p in diff:
+        mysql_engine.query_selector(f"""USE recipes""")
+        query_sql = f"""SELECT name, minutes, tags, nutrition, steps, description, ingredients FROM mytable WHERE id = '{p}' """ 
+        data = mysql_engine.query_selector(query_sql)
+        for i in data:
+            result.append(dict(zip(keys,i)))
+
+    return result
+
 def sql_recipe_search(ingred_lst_str):
     ingred_lst = []
     for ingred in ingred_lst_str.split(','):
@@ -104,6 +159,14 @@ def recipes_search():
     pantry = body['pantry']  # string list - this is the list of ingredients
 
     # Output is a list of dicts on information about each recipe (jsonified)
-    return json.dumps(boolean_search(pantry, query))
+    subsets = subset_search(pantry)
+    
+    descriptions = [recipe['description'] for recipe in subsets]
+
+    indices = jaccard_similarity(descriptions, query)
+
+    ranked = [subsets[i] for i in indices]
+
+    return json.dumps(ranked)
 
 app.run(debug=True)
