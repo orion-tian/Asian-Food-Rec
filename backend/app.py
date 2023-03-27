@@ -47,21 +47,24 @@ def boolean_search(ingred_lst, query_lst):
     # then add recipe to result list
     for row in data:
         data_dict = dict(zip(keys,row))
-        recipe_ingred_lst = []
-        ingred_lst_str = data_dict['ingredients'].strip()
-        ingred_lst_str = ingred_lst_str[1:len(ingred_lst_str)-1]
-        for i in ingred_lst_str.split(','):
-            ingred = i.strip()
-            ingred = ingred[1:len(ingred)-1]
-            print(ingred)
-            recipe_ingred_lst.append(ingred)
+        print(data_dict)
+        print()
+        # recipe_ingred_lst = []
+        # ingred_lst_str = data_dict['ingredients'].strip()
+        # ingred_lst_str = ingred_lst_str[1:len(ingred_lst_str)-1]
+        # for i in ingred_lst_str.split(','):
+        #     ingred = i.strip()
+        #     ingred = ingred[1:len(ingred)-1]
+        #     # print(ingred)
+        #     recipe_ingred_lst.append(ingred)
 
         # print(recipe_ingred_lst)
         # print()
-        if set(recipe_ingred_lst).issubset(set(ingred_lst)):
-            result.append((data_dict['name'], data_dict['id'], data_dict['ingredients']))
+        # if set(recipe_ingred_lst).issubset(set(ingred_lst)):
+        #     result.append((data_dict['name'], data_dict['id'], data_dict['ingredients']))
 
-    return result
+    # return result
+    return []
 
 def sql_recipe_search(ingred_lst_str):
     ingred_lst = []
