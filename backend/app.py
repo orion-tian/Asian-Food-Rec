@@ -45,9 +45,9 @@ def boolean_search(ingred_lst, query_lst):
         
         posting_set = set()
         data = [str(i) for i in data]
-        for tuple in data:
-            tuple = tuple[3:len(tuple)-4]
-            for p in tuple.split(','):
+        for tup in data:
+            tup = tup[3:len(tup)-4]
+            for p in tup.split(','):
                 posting_set.add(p.strip())
 
         ingred_postings.append(posting_set)
@@ -85,9 +85,9 @@ def subset_search(ingred_lst):
     query_sql = f"""SELECT posting FROM inverted_index""" 
     data = mysql_engine.query_selector(query_sql)
     data = [str(i) for i in data]
-    for tuple in data:
-        tuple = tuple[3:len(tuple)-4]
-        for p in tuple.split(','):
+    for tup in data:
+        tup = tup[3:len(tup)-4]
+        for p in tup.split(','):
             all_posting_set.add(p.strip())
     
     not_ingred_postings = []
@@ -99,9 +99,9 @@ def subset_search(ingred_lst):
         
         posting_set = set()
         data = [str(i) for i in data]
-        for tuple in data:
-            tuple = tuple[3:len(tuple)-4]
-            for p in tuple.split(','):
+        for tup in data:
+            tup = tup[3:len(tup)-4]
+            for p in tup.split(','):
                 posting_set.add(p.strip())
 
         not_ingred_postings.append(posting_set)
