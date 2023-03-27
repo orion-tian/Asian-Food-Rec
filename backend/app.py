@@ -91,9 +91,24 @@ def home():
 #     text = request.args.get("title")
 #     return sql_search(text)
 
-@app.route("/recipes")
-def episodes_search():
-    text = request.args.get("title")
-    return sql_recipe_search(text)
+
+# @app.route("/recipes")
+# def episodes_search():
+#     text = request.args.get("title")
+#     return sql_recipe_search(text)
+
+
+@app.route("/recipes", methods=['GET'])
+def recipes_search():
+    body = request.json
+    query = body['query']  # string - this is the freeform query
+    pantry = body['pantry']  # string list - this is the list of ingredients
+
+    # do something
+    idk = sql_recipe_search(query)
+
+    # Output should be a list of recipes (jsonified)
+    return idk
+
 
 app.run(debug=True)
