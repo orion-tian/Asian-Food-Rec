@@ -77,7 +77,14 @@ def subset_search(ingred_lst):
     mysql_engine.query_selector(f"""USE recipes""")
     query_sql = f"""SELECT ingredient from inverted_index WHERE ingredient NOT IN {repr(tuple(map(str, ingred_lst)))}"""
     data = mysql_engine.query_selector(query_sql)
-    not_ingred_lst = [str(i)[4:len(i)-4].strip() for i in data]
+    data = [str(i) for i in data]
+    not_ingred_lst = []
+
+    for tup in data:
+        tup = tup[3:len(tup)-4]
+        for p in tup.split(','):
+            not_ingred_lst.add(p.strip())
+
     print(not_ingred_lst)
     all_posting_set = set()
 
