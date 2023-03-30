@@ -23,7 +23,7 @@ services:
     command: gunicorn --bind 0.0.0.0:5000 --workers 4 "app:app"
   db:
     container_name: ${TEAM_NAME}_db
-    image: mariadb:10.5.8
+    image: mysql:latest
     restart: always
     environment:
       - MYSQL_USER=admin
