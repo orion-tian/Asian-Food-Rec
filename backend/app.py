@@ -26,6 +26,7 @@ mysql_engine.load_file_into_db()
 
 app = Flask(__name__)
 CORS(app, origins=["https://asianfood.vercel.app/"])
+app.config['CORS_HEADERS'] = 'Content-Type'
 
 _keys = ['name', 'id', 'minutes', 'tags', 'nutrition', 'steps', 'description', 'ingredients']
 
