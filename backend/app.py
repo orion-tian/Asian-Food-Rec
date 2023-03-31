@@ -1,6 +1,6 @@
 import json
 import os
-from flask import Flask, render_template, request
+from flask import Flask, send_from_directory, request
 from flask_cors import CORS
 from jaccard import jaccard_similarity
 from helpers.MySQLDatabaseHandler import MySQLDatabaseHandler
@@ -24,7 +24,7 @@ mysql_engine = MySQLDatabaseHandler(MYSQL_USER,MYSQL_USER_PASSWORD,MYSQL_PORT,MY
 # Path to init.sql file. This file can be replaced with your own file for testing on localhost, but do NOT move the init.sql file
 mysql_engine.load_file_into_db()
 
-app = Flask(__name__)
+app = Flask(__name__, static_url_path='',)
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
@@ -175,7 +175,8 @@ def sql_recipe_search(ingred_lst_str):
 
 @app.route("/")
 def home():
-    return render_template('base.html',title="sample html")
+    # return render_template('base.html',title="sample html")
+    return send_from_directory(app.static_folder, "index.html")
 
 # @app.route("/episodes")
 # def episodes_search():
