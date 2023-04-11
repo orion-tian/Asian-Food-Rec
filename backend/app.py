@@ -118,6 +118,7 @@ def subset_search(ingred_lst):
     not_ingred_lst = []
 
     for tup in data:
+        print(tup)
         tup = tup[2:len(tup)-3]
         for p in tup.split(','):
             not_ingred_lst.append(p.strip())
@@ -197,7 +198,11 @@ def recipes_search():
     print(query)
     print(pantry)
     # Output is a list of dicts on information about each recipe (jsonified)
-    subsets = boolean_search(pantry)
+    
+    # subsets = boolean_search(pantry)
+    
+    subsets = subset_search(pantry)
+    
     print(len(subsets))
     
     descriptions = [str(recipe['name']) + str(recipe['description']) + str(recipe['steps']) for recipe in subsets]
