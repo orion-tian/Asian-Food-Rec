@@ -209,9 +209,24 @@ def recipes_search():
 
 @app.route("/recipes/<int:id>")
 def recipes(id):
+    result = []
     mysql_engine.query_selector(f"""USE recipes""")
-    query_sql = f"""SELECT name, id, minutes, tags, nutrition, steps, description, ingredients FROM mytable WHERE id = '{id}' """ 
+    query_sql = f"""SELECT name, id, minutes, tags, nutrition, steps, description FROM mytable WHERE id = '{id}' """ 
     data = mysql_engine.query_selector(query_sql)
-    return dict(zip(_keys,data[0]))
+    for val in data:
+            values = []
+            for i in val:
+                if type(i) == str and len(i) > 0 and i[0] == '[':
+                    curVal = i.strip('][').replace("'","").split(', ')
+                    try:
+                        values.append(int(curVal))
+                    except Exception:
+                        values.append(curVal)
+                else:
+                    values.append(i)
+            
+            result.append(dict(zip(_keys, values)))
+
+    return result
 
 # app.run(debug=True)
