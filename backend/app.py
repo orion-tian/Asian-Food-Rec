@@ -29,7 +29,8 @@ app = Flask(__name__, static_url_path='',)
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-_keys = ['name', 'id', 'minutes', 'tags', 'nutrition', 'steps', 'description', 'ingredients']
+# _keys = ['name', 'id', 'minutes', 'tags', 'nutrition', 'steps', 'description', 'ingredients']
+_keys_modifed = ['name', 'id', 'minutes', 'nutrition', 'ingredients']
 
 def get_postings_from_data(data):
     data = [str(i) for i in data]
@@ -48,6 +49,40 @@ def get_sql_tuple_from_postings(postings):
 def get_sql_tuple_from_ingredients(ingredient_lst):
     return "(" + str(ingredient_lst)[1:-1].replace("%", "%%") + ")"
 
+def get_fields_too_long(field, postings_str):
+    len_wo_trun = 250
+    magic_num_min_len = 50
+    
+    postings_lst = [p.strip() for p in postings_str[1:-1].split(',')]
+    result = []
+    for i in range(len(postings_lst)):
+        result.append("")
+
+    # substring doesn't work if one of the strings has index out of bounds 
+    # so go one by one
+    for i, p in enumerate(postings_lst):
+        
+        length_of_result = len_wo_trun
+        index = 1
+        
+        while length_of_result >= magic_num_min_len:
+            mysql_engine.query_selector(f"""USE recipes""")
+            query_sql = f"""
+                        SELECT SUBSTRING({field}, {index}, {len_wo_trun})
+                        FROM mytable 
+                        WHERE mytable.id = {p}""" 
+        
+            data = mysql_engine.query_selector(query_sql)
+            data = [str(i) for i in data]
+            tup = ast.literal_eval(data[0])
+            for val in tup:
+                curVal = val.strip('][').replace("'","")
+                result[i] += curVal
+                index += len_wo_trun
+            length_of_result = len(curVal)
+    
+    return result
+
 def get_recipes_from_postings(result_postings):
     if len(result_postings) == 0:
         return []
@@ -57,7 +92,7 @@ def get_recipes_from_postings(result_postings):
                         SELECT inverted_index.id, CONCAT("[", group_concat(inverted_index.ingredient), "]") AS ingredients 
                         FROM inverted_index GROUP BY inverted_index.id
                     )
-                    SELECT name, mytable.id, minutes, tags, nutrition, steps, description, ings.ingredients 
+                    SELECT name, mytable.id, minutes, nutrition, ings.ingredients 
                     FROM mytable 
                     INNER JOIN ings
                     ON mytable.id = ings.id
@@ -80,7 +115,22 @@ def get_recipes_from_postings(result_postings):
             else:
                 values.append(val)
             
-        result.append(dict(zip(_keys, values)))
+        result.append(dict(zip(_keys_modifed, values)))
+    
+    # get steps field
+    steps_lst = get_fields_too_long('steps', postings_str)
+    for i, steps in enumerate(steps_lst):
+        result[i].update({'steps': steps})
+
+    # get tags field
+    tags_lst = get_fields_too_long('tags', postings_str)
+    for i, tags in enumerate(tags_lst):
+        result[i].update({'tags': [t.strip() for t in tags.split(',')]})
+
+    # get description field
+    descrip_lst = get_fields_too_long('description', postings_str)
+    for i, descrp in enumerate(descrip_lst):
+        result[i].update({'description': descrp})
     
     return result
 
@@ -209,6 +259,6 @@ def recipes_search():
 
 @app.route("/recipes/<int:id>")
 def recipes(id):
-    return get_recipes_from_postings([id])[0]
+    return get_recipes_from_postings([id])
 
 # app.run(debug=True)
