@@ -29,19 +29,10 @@ app = Flask(__name__, static_folder="frontend-build")
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-# _keys = ['name', 'id', 'minutes', 'tags', 'nutrition', 'steps', 'description', 'ingredients']
-_keys_modifed = ['name', 'id', 'minutes', 'nutrition', 'ingredients']
+_keys = ['name', 'id', 'minutes', 'tags', 'nutrition', 'steps', 'description', 'ingredients']
 
 def get_postings_from_data(data):
-    data = [str(i) for i in data]
-
-    postings = set()
-
-    for tup in data:
-        tup = tup[1:-2]
-        postings.add(int(tup))
-
-    return postings
+    return set(row["id"] for row in data)
 
 def get_sql_tuple_from_postings(postings):
     return "(" + str(postings)[1:-1] + ")"
@@ -49,90 +40,34 @@ def get_sql_tuple_from_postings(postings):
 def get_sql_tuple_from_ingredients(ingredient_lst):
     return "(" + str(ingredient_lst)[1:-1].replace("%", "%%") + ")"
 
-def get_fields_too_long(field, postings_str):
-    len_wo_trun = 250
-    magic_num_min_len = 50
-    
-    postings_lst = [p.strip() for p in postings_str[1:-1].split(',')]
-    result = []
-    for i in range(len(postings_lst)):
-        result.append("")
-
-    # substring doesn't work if one of the strings has index out of bounds 
-    # so go one by one
-    for i, p in enumerate(postings_lst):
-        
-        length_of_result = len_wo_trun
-        index = 1
-        
-        while length_of_result >= magic_num_min_len:
-            mysql_engine.query_selector(f"""USE recipes""")
-            query_sql = f"""
-                        SELECT SUBSTRING({field}, {index}, {len_wo_trun})
-                        FROM mytable 
-                        WHERE mytable.id = {p}""" 
-        
-            data = mysql_engine.query_selector(query_sql)
-            data = [str(i) for i in data]
-            tup = ast.literal_eval(data[0])
-            for val in tup:
-                curVal = val.strip('][').replace("'","")
-                result[i] += curVal
-                index += len_wo_trun
-            length_of_result = len(curVal)
-    
-    return result
-
 def get_recipes_from_postings(result_postings):
     if len(result_postings) == 0:
         return []
     postings_str = get_sql_tuple_from_postings(result_postings)
     mysql_engine.query_selector(f"""USE recipes""")
     query_sql = f"""WITH ings AS (
-                        SELECT inverted_index.id, CONCAT("[", group_concat(inverted_index.ingredient), "]") AS ingredients 
+                        SELECT inverted_index.id, CONCAT("[", group_concat(QUOTE(inverted_index.ingredient)), "]") AS ingredients 
                         FROM inverted_index GROUP BY inverted_index.id
                     )
-                    SELECT name, mytable.id, minutes, nutrition, ings.ingredients 
+                    SELECT name, mytable.id, minutes, tags, nutrition, steps, description, ings.ingredients 
                     FROM mytable 
                     INNER JOIN ings
                     ON mytable.id = ings.id
                     WHERE mytable.id IN {postings_str}""" 
     
     data = mysql_engine.query_selector(query_sql)
-    data = [str(i) for i in data]
-    result = []
-    for recipe in data:
-        tup = ast.literal_eval(recipe)
+    
+    results = []
+    for row in data:
         values = []
-        for val in tup:
-            if type(val) == str and len(val) > 0 and val[0] == '[':
-                curVal = val.strip('][').replace("'","").split(',')
-                curVal = [v.strip() for v in curVal]
-                try:
-                    values.append(int(curVal))
-                except Exception:
-                    values.append(curVal)
-            else:
-                values.append(val)
-            
-        result.append(dict(zip(_keys_modifed, values)))
-    
-    # get steps field
-    steps_lst = get_fields_too_long('steps', postings_str)
-    for i, steps in enumerate(steps_lst):
-        result[i].update({'steps': steps})
+        for key in _keys:
+            try:
+                values.append(ast.literal_eval(str(row[key])))
+            except:
+                values.append(row[key])
+        results.append(dict(zip(_keys, values)))
 
-    # get tags field
-    tags_lst = get_fields_too_long('tags', postings_str)
-    for i, tags in enumerate(tags_lst):
-        result[i].update({'tags': [t.strip() for t in tags.split(',')]})
-
-    # get description field
-    descrip_lst = get_fields_too_long('description', postings_str)
-    for i, descrp in enumerate(descrip_lst):
-        result[i].update({'description': descrp})
-    
-    return result
+    return results[1:]
 
 # returns postings that contain any of the ingredients in ingredients list
 def get_postings_containing_ingredients(ingredient_lst):
@@ -173,7 +108,6 @@ def boolean_search(ingred_lst):
 
 def subset_search(ingred_lst):
     mysql_engine.query_selector(f"""USE recipes""")
-    print(ingred_lst)
     if len(ingred_lst) == 0:
         return boolean_search(ingred_lst)
     if len(ingred_lst) == 1:
@@ -181,15 +115,9 @@ def subset_search(ingred_lst):
     else:
         query_sql = f"""SELECT DISTINCT ingredient from inverted_index WHERE ingredient NOT IN {repr(tuple(map(str, ingred_lst)))}"""
 
-    print(query_sql)
     data = mysql_engine.query_selector(query_sql)
-    data = [str(i) for i in data][1:-1]
-    not_ingred_lst = []
+    not_ingred_lst = [row["ingredient"] for row in data]
 
-    for tup in data:
-        tup = tup[2:len(tup)-3]
-        for p in tup.split(','):
-            not_ingred_lst.append(p.strip())
     all_posting_set = set()
 
     mysql_engine.query_selector(f"""USE recipes""")
@@ -239,26 +167,23 @@ def recipes_search():
     body = request.json
     query = body['query']  # string - this is the freeform query
     pantry = body['pantry']  # string list - this is the list of ingredients
-    print(query)
-    print(pantry)
+
     # Output is a list of dicts on information about each recipe (jsonified)
     
     # subsets = boolean_search(pantry)
 
     subsets = subset_search(pantry)
     
-    print(len(subsets))
-    
     descriptions = [str(recipe['name']) + str(recipe['description']) + str(recipe['steps']) for recipe in subsets]
 
     indices = jaccard_similarity(descriptions, query)
 
     ranked = [subsets[i] for i in indices][0:9]
-    print(len(ranked))
+
     return json.dumps(ranked)
 
 @app.route("/recipes/<int:id>")
 def recipes(id):
-    return get_recipes_from_postings([id])
+    return get_recipes_from_postings([id])[0]
 
 # app.run(debug=True)
