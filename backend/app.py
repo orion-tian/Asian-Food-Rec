@@ -66,7 +66,6 @@ def get_recipes_from_postings(result_postings):
             except:
                 values.append(row[key])
         results.append(dict(zip(_keys, values)))
-
     return results[1:]
 
 # returns postings that contain any of the ingredients in ingredients list
@@ -184,6 +183,10 @@ def recipes_search():
 
 @app.route("/recipes/<int:id>")
 def recipes(id):
-    return get_recipes_from_postings([id])[0]
+    recipe = get_recipes_from_postings([0, id])
+    if len(recipe) == 1:
+        return json.dumps(recipe[0])
+    else:
+        return json.dumps({})
 
 # app.run(debug=True)
