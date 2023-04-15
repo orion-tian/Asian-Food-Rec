@@ -225,11 +225,14 @@ def recipes_search():
 
     subsets = subset_search(pantry)
     
-    descriptions = [str(recipe['name']) + str(recipe['description']) + str(recipe['steps']) for recipe in subsets]
+    descriptions = [str(recipe['name']) + str(recipe['description']) 
+                    + str(recipe['steps']) + str([d['review'] for d in recipe['user_data']]) for recipe in subsets]
+    
+    ratings = [recipe['avg_rating'] for recipe in subsets]
 
-    indices = jaccard_similarity(descriptions, query)
+    indices = jaccard_similarity(descriptions, ratings, query)
 
-    ranked = [subsets[i] for i in indices][0:9]
+    ranked = [subsets[i] for i in indices[0:9]]
 
     return json.dumps(ranked)
 
