@@ -5,7 +5,7 @@ import pickle
 df = pd.read_csv('RAW_interactions.csv')
 filtered_dataset = pd.read_csv('filtered_dataset.csv')
 
-# original colums: user_id,recipe_id,date,rating,review
+# original columns: user_id,recipe_id,date,rating,review
 df = df.drop("user_id", axis=1)
 df = df.drop("date", axis=1)
 

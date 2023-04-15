@@ -42,29 +42,30 @@ def get_sql_tuple_from_ingredients(ingredient_lst):
     return "(" + str(ingredient_lst)[1:-1].replace("%", "%%") + ")"
 
 def get_user_data_from_postings(result_postings):
-   if len(result_postings) == 0:
-       return []
-   postings_str = get_sql_tuple_from_postings(result_postings)
-   mysql_engine.query_selector(f"""USE recipes""")
-   query_sql = f"""SELECT recipe_id, rating, review FROM user_data WHERE recipe_id IN {postings_str}"""
-  
-   data = mysql_engine.query_selector(query_sql)
-  
-   intermedi = []
-   for row in data:
-       values = []
-       for key in _keys_user_data:
-           try:
-               values.append(ast.literal_eval(str(row[key])))
-           except:
-               values.append(row[key])
-       intermedi.append(dict(zip(_keys_user_data, values)))
-   intermedi = intermedi[1:]
+    if len(result_postings) == 0:
+        return []
+    postings_str = get_sql_tuple_from_postings(result_postings)
+    mysql_engine.query_selector(f"""USE recipes""")
+    query_sql = f"""SELECT recipe_id, rating, review FROM user_data WHERE recipe_id IN {postings_str}"""
+    
+    data = mysql_engine.query_selector(query_sql)
+    
+    intermedi = []
+    for row in data:
+        values = []
+        for key in _keys_user_data:
+            try:
+                values.append(ast.literal_eval(str(row[key])))
+            except:
+                values.append(row[key])
+        intermedi.append(dict(zip(_keys_user_data, values)))
+    intermedi = intermedi[1:]
 
    # combine user data of same recipe together into
    # [{recipe_id:x, user_data:[{rating:x, review:x}, {}]}, {},...]
-   results = []
-   for d in intermedi:
+    results = []
+
+    for d in intermedi:
        recipe_id = d['recipe_id']
        found = False
        for r_d in results:
@@ -72,10 +73,14 @@ def get_user_data_from_postings(result_postings):
                r_d['user_data'].append({'rating': d['rating'], 'review': d['review']})
                found = True
                break
-       if not found:
-           results.append({'recipe_id': recipe_id, 'user_data': [{'rating': d['rating'], 'review': d['review']}]})
+       if (not found):
+        results.append({'recipe_id': recipe_id, 'user_data': [{'rating': d['rating'], 'review': d['review']}]})
+    
+    for r in results:
+        avg_rating = sum((d['rating'] for d in r['user_data']))/len(r['user_data'])
+        r.update({'avg_rating': avg_rating})
 
-   return results
+    return results
 
 def get_recipes_from_postings(result_postings):
     if len(result_postings) == 0:
@@ -103,6 +108,16 @@ def get_recipes_from_postings(result_postings):
             except:
                 values.append(row[key])
         results.append(dict(zip(_keys, values)))
+    
+    # add user_data
+    user_data = get_user_data_from_postings(result_postings)
+    for d in user_data:
+        recipe_id = d['recipe_id']
+        for r_d in results:
+            if recipe_id == r_d['id']:
+                r_d.update({'avg_rating': d['avg_rating'], 'user_data': d['user_data']})
+                break
+
     return results[1:]
 
 # returns postings that contain any of the ingredients in ingredients list
