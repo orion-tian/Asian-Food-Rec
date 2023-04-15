@@ -29,7 +29,8 @@ app = Flask(__name__, static_folder="frontend-build")
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-_keys = ['name', 'id', 'minutes', 'tags', 'nutrition', 'steps', 'description', 'ingredients']
+_keys = ['name', 'id', 'minutes', 'tags', 'nutrition', 'steps', 'description', 'ingredients', 'img_link']
+_keys_user_data = ['recipe_id', 'rating', 'review']
 
 def get_postings_from_data(data):
     return set(row["id"] for row in data)
@@ -40,6 +41,42 @@ def get_sql_tuple_from_postings(postings):
 def get_sql_tuple_from_ingredients(ingredient_lst):
     return "(" + str(ingredient_lst)[1:-1].replace("%", "%%") + ")"
 
+def get_user_data_from_postings(result_postings):
+   if len(result_postings) == 0:
+       return []
+   postings_str = get_sql_tuple_from_postings(result_postings)
+   mysql_engine.query_selector(f"""USE recipes""")
+   query_sql = f"""SELECT recipe_id, rating, review FROM user_data WHERE recipe_id IN {postings_str}"""
+  
+   data = mysql_engine.query_selector(query_sql)
+  
+   intermedi = []
+   for row in data:
+       values = []
+       for key in _keys_user_data:
+           try:
+               values.append(ast.literal_eval(str(row[key])))
+           except:
+               values.append(row[key])
+       intermedi.append(dict(zip(_keys_user_data, values)))
+   intermedi = intermedi[1:]
+
+   # combine user data of same recipe together into
+   # [{recipe_id:x, user_data:[{rating:x, review:x}, {}]}, {},...]
+   results = []
+   for d in intermedi:
+       recipe_id = d['recipe_id']
+       found = False
+       for r_d in results:
+           if recipe_id == r_d['recipe_id']:
+               r_d['user_data'].append({'rating': d['rating'], 'review': d['review']})
+               found = True
+               break
+       if not found:
+           results.append({'recipe_id': recipe_id, 'user_data': [{'rating': d['rating'], 'review': d['review']}]})
+
+   return results
+
 def get_recipes_from_postings(result_postings):
     if len(result_postings) == 0:
         return []
@@ -49,7 +86,7 @@ def get_recipes_from_postings(result_postings):
                         SELECT inverted_index.id, CONCAT("[", group_concat(QUOTE(inverted_index.ingredient)), "]") AS ingredients 
                         FROM inverted_index GROUP BY inverted_index.id
                     )
-                    SELECT name, mytable.id, minutes, tags, nutrition, steps, description, ings.ingredients 
+                    SELECT name, mytable.id, minutes, tags, nutrition, steps, description, ings.ingredients, img_link
                     FROM mytable 
                     INNER JOIN ings
                     ON mytable.id = ings.id
