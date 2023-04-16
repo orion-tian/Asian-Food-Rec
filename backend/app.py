@@ -25,7 +25,7 @@ mysql_engine = MySQLDatabaseHandler(MYSQL_USER,MYSQL_USER_PASSWORD,MYSQL_PORT,MY
 # Path to init.sql file. This file can be replaced with your own file for testing on localhost, but do NOT move the init.sql file
 mysql_engine.load_file_into_db()
 
-app = Flask(__name__, static_folder="frontend-build")
+app = Flask(__name__, static_url_path='/', static_folder="frontend-build")
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
