@@ -225,10 +225,22 @@ def recipes_search():
 
     # recipes = subset_search(pantry)
     
-    descriptions = [str(recipe['name']) + str(recipe['description']) 
-                    + str(recipe['steps']) + str([d['review'] for d in recipe['user_data']]) for recipe in recipes]
-    
-    ratings = [recipe['avg_rating'] for recipe in recipes]
+    descriptions = []
+    for recipe in recipes:
+        try: 
+            descriptions.append(str(recipe['name']) + str(recipe['description']) 
+                    + str(recipe['steps']) + str([d['review'] for d in recipe['user_data']]))
+        except:
+            descriptions.append(str(recipe['name']) + str(recipe['description']) 
+                    + str(recipe['steps']))
+
+    ratings = []
+    for recipe in recipes:
+        try: 
+            ratings.append(recipe['avg_rating'])
+        except:
+            # want ratings to match up to right recipe indexwise so need to add something
+            ratings.append(2.5)
 
     indices = jaccard_similarity(descriptions, ratings, query)
 
