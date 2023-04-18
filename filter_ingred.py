@@ -15,7 +15,7 @@ def get_img_link(name, id):
     global i
     kebab_name = re.sub("\s+", "-", name)
 
-    gallery_page = f"""https://food.com/recipe/{kebab_name}-{id}#gallery"""
+    gallery_page = f"""https://www.food.com/recipe/{kebab_name}-{id}#gallery"""
 
     done = False
     while (not done):

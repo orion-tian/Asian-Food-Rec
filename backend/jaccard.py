@@ -12,7 +12,7 @@ def jaccard_similarity(descriptions, ratings, query):
   # rating ranges from 0-5 while jaccard range much smaller 
   # so make ratings_weight quite smaller to make around same range
   ratings_weight = 0.01
-  jaccard_weight = 1.0
+  jaccard_weight = 1.5
 
   query_words = set(tokenize(query))
   similarities = []

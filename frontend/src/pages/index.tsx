@@ -47,7 +47,9 @@ export default function Home() {
   const [sliderValue, setSliderValue] = useState(50);
 
   // Modal
-  const [selectedRecipe, setSelectedRecipe] = useState<BaseRecipe | undefined>();
+  const [selectedRecipe, setSelectedRecipe] = useState<
+    BaseRecipe | undefined
+  >();
   const [selectedId, setSelectedId] = useState<number | undefined>();
   const [opened, { open, close }] = useDisclosure(false);
 
@@ -72,6 +74,8 @@ export default function Home() {
         minutes: 60,
         ingredients: ["fefw", "hiewfwf", "oiwef"],
         steps: ["Do this first", "Then This", "Then this"],
+        img_link:
+          "https://thewoksoflife.com/wp-content/uploads/2019/06/mapo-tofu-10.jpg",
       };
       return placeholder;
       // if (selectedId) {
@@ -100,7 +104,7 @@ export default function Home() {
       header={
         <Header height={70} px="lg" py="md">
           <Center>
-            <Title order={2}>Asian Food Rec</Title>
+            <Title order={2}>Asian Food Recs</Title>
           </Center>
         </Header>
       }
@@ -237,7 +241,7 @@ export default function Home() {
           {data?.slice(0, 8).map((recipe) => (
             <RecipeCard
               key={recipe.name}
-              imageSrc="https://thewoksoflife.com/wp-content/uploads/2019/06/mapo-tofu-10.jpg"
+              imageSrc={recipe.img_link}
               {...recipe}
               detailCallback={() => {
                 setSelectedId(recipe.id);

@@ -6,6 +6,7 @@ export type BaseRecipe = {
   minutes: number;
   ingredients: string[];
   steps: string[];
+  img_link: string;
 };
 
 export type FullRecipe = BaseRecipe & {};
