@@ -1,9 +1,11 @@
 from __future__ import print_function
 import pandas as pd
+import pickle
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import normalize
 from scipy.sparse.linalg import svds
+import sklearn
 
 import matplotlib
 import numpy as np
@@ -130,14 +132,18 @@ docs_compressed_normed = normalize(docs_compressed)
 # print()"""
 
 # what if query has multiple words?
-query = "high protein"
+query = "frozen dessert"
 query_tfidf = vectorizer.transform([query]).toarray()
 print("query: " + query)
 print("query tf-idf shape:")
 print(query_tfidf.shape)
 print()
+print(np.__version__)
+print(sklearn.__version__)
+print(pd.__version__)
 
 query_vec = normalize(np.dot(query_tfidf, words_compressed_normed)).squeeze()
+print(type(words_compressed_normed))
 
 def closest_projects_to_query(query_vec_in, k = 5):
     sims = docs_compressed_normed.dot(query_vec_in)
@@ -151,7 +157,15 @@ for i, proj, sim in closest_projects_to_query(query_vec):
 # so need to store words_compressed_normed and docs_compressed_normed
 df_words = pd.DataFrame(words_compressed_normed)
 df_docs = pd.DataFrame(docs_compressed_normed)
+
 df_words.to_csv('compressed_words.csv', index=False)
 df_docs.to_csv('compressed_docs.csv', index=False)
+
+# with open('compressed_words.pickle', 'wb') as f:
+#     pickle.dump(words_compressed_normed, f)
+# with open('compressed_docs.pickle', 'wb') as f:
+#     pickle.dump(docs_compressed_normed, f)
+# with open('documents.pickle', 'wb') as f:
+#     pickle.dump(documents, f)
 
 

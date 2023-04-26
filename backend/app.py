@@ -3,9 +3,8 @@ import os
 from flask import Flask, send_from_directory, request
 from flask_cors import CORS
 from jaccard import jaccard_similarity
+from jaccard import svd_similarity
 from helpers.MySQLDatabaseHandler import MySQLDatabaseHandler
-# import boolean_search
-import pickle
 import ast
 
 # ROOT_PATH for linking with all your files. 
@@ -29,7 +28,7 @@ app = Flask(__name__, static_url_path='/', static_folder="frontend-build")
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-_keys = ['name', 'id', 'minutes', 'tags', 'nutrition', 'steps', 'description', 'ingredients', 'img_link']
+_keys = ['name', 'row_no', 'id', 'minutes', 'tags', 'nutrition', 'steps', 'description', 'ingredients', 'img_link']
 _keys_user_data = ['recipe_id', 'rating', 'review']
 
 def get_postings_from_data(data):
@@ -91,7 +90,7 @@ def get_recipes_from_postings(result_postings):
                         SELECT inverted_index.id, CONCAT("[", group_concat(QUOTE(inverted_index.ingredient)), "]") AS ingredients 
                         FROM inverted_index GROUP BY inverted_index.id
                     )
-                    SELECT name, mytable.id, minutes, tags, nutrition, steps, description, ings.ingredients, img_link
+                    SELECT name, row_no, mytable.id, minutes, tags, nutrition, steps, description, ings.ingredients, img_link
                     FROM mytable 
                     INNER JOIN ings
                     ON mytable.id = ings.id
@@ -225,14 +224,14 @@ def recipes_search():
 
     # recipes = subset_search(pantry)
     
-    descriptions = []
-    for recipe in recipes:
-        try: 
-            descriptions.append(str(recipe['name']) + str(recipe['description']) 
-                    + str(recipe['steps']) + str([d['review'] for d in recipe['user_data']]))
-        except:
-            descriptions.append(str(recipe['name']) + str(recipe['description']) 
-                    + str(recipe['steps']))
+    # descriptions = []
+    # for recipe in recipes:
+    #     try: 
+    #         descriptions.append(str(recipe['name']) + str(recipe['description']) 
+    #                 + str(recipe['steps']) + str([d['review'] for d in recipe['user_data']]))
+    #     except:
+    #         descriptions.append(str(recipe['name']) + str(recipe['description']) 
+    #                 + str(recipe['steps']))
 
     ratings = []
     for recipe in recipes:
@@ -242,9 +241,21 @@ def recipes_search():
             # want ratings to match up to right recipe indexwise so need to add something
             ratings.append(2.5)
 
-    indices = jaccard_similarity(descriptions, ratings, query)
+    # indices = jaccard_similarity(descriptions, ratings, query)
 
-    ranked = [recipes[i] for i in indices[0:9]]
+    row_nums = []
+    for recipe in recipes:
+        row_nums.append(recipe['row_no'])
+
+    indices = svd_similarity(row_nums, ratings, query)
+
+    print(indices, flush=True)
+    print([ r['name'] for r in recipes], flush=True)
+
+    if len(indices) >= 9:
+        ranked = [recipes[i] for i in indices[0:9]]
+    else:
+        ranked = [recipes[i] for i in indices]
 
     return json.dumps(ranked)
 
