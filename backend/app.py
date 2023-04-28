@@ -249,9 +249,6 @@ def recipes_search():
 
     indices = svd_similarity(row_nums, ratings, query)
 
-    print(indices, flush=True)
-    print([ r['name'] for r in recipes], flush=True)
-
     if len(indices) >= 9:
         ranked = [recipes[i] for i in indices[0:9]]
     else:

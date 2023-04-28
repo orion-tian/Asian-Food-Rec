@@ -51,7 +51,7 @@ def svd_similarity(recipe_rows, ratings, query, k=15):
   svd_weight = 1.0
 
   if query == "":
-     return [i for i in range(k+1)]
+    return [i for i in range(k+1)]
 
   query_tfidf = vectorizer.transform([query]).toarray()
   
@@ -59,12 +59,9 @@ def svd_similarity(recipe_rows, ratings, query, k=15):
 
   sims = docs_compressed_normed.dot(query_vec)
   
-  if len(recipe_rows) > 0:
-    svd_scores = np.array([svd_weight*sims[r] for r in recipe_rows])
-    rating_scores = np.array([ratings_weight*ratings[i] for i in range(len(recipe_rows))])
-    scores = np.add(svd_scores, rating_scores)
-  else:
-     scores = np.array([svd_weight*sims[i] for i in range(k+1)])
+  svd_scores = np.array([svd_weight*sims[r] for r in recipe_rows])
+  rating_scores = np.array([ratings_weight*ratings[i] for i in range(len(recipe_rows))])
+  scores = np.add(svd_scores, rating_scores)
   
   asort = np.argsort(-scores)[:k+1]
 
