@@ -103,11 +103,14 @@ def get_recipes_from_postings(result_postings):
         values = []
         for key in _keys:
             try:
-                values.append(ast.literal_eval(str(row[key])))
+                if key == "img_link":
+                    values.append(str(row[key]).replace("%%", "%"))
+                else:
+                    values.append(ast.literal_eval(str(row[key])))
             except:
                 values.append(row[key])
         results.append(dict(zip(_keys, values)))
-    
+
     # add user_data
     user_data = get_user_data_from_postings(result_postings)
     for d in user_data:
@@ -249,10 +252,7 @@ def recipes_search():
 
     indices = svd_similarity(row_nums, ratings, query)
 
-    if len(indices) >= 9:
-        ranked = [recipes[i] for i in indices[0:9]]
-    else:
-        ranked = [recipes[i] for i in indices]
+    ranked = [recipes[i] for i in indices[0:9]]
 
     return json.dumps(ranked)
 
