@@ -15,6 +15,7 @@ import {
   Loader,
   Modal,
   SegmentedControl,
+  Input,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import ingredients from "@/data/ingredients.json";
@@ -219,26 +220,27 @@ export default function Home() {
                 timingFunction: "ease",
               }}
             />
-            <Group position="center" mt="xl">
-              <SegmentedControl
-                value={configValue}
-                data={[
-                  {
-                    label: "All Ingredients Are In Recipe",
-                    value: "includesIng",
-                  },
-                  {
-                    label: "Interested In These Ingredients",
-                    value: "mixed",
-                  },
-                  {
-                    label: "Recipes Only Include These Ingredients",
-                    value: "onlyTheseIng",
-                  },
-                ]}
-                onChange={setSliderConfig}
-              />
+            <Group position="left" mt="xl">
+              <Input.Label>How should we use your pantry?</Input.Label>
             </Group>
+            <SegmentedControl
+              value={configValue}
+              data={[
+                {
+                  label: "Incorporate All",
+                  value: "includesIng",
+                },
+                {
+                  label: "Interested In",
+                  value: "mixed",
+                },
+                {
+                  label: "Only Include",
+                  value: "onlyTheseIng",
+                },
+              ]}
+              onChange={setSliderConfig}
+            />
             <Group position="center" mt="xl">
               <Button
                 variant="default"
