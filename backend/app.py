@@ -223,7 +223,13 @@ def recipes_search():
 
     # Output is a list of dicts on information about each recipe (jsonified)
     
-    recipes = boolean_search(pantry)
+    if body['config'] == 'includesIng':
+        recipes = boolean_search(pantry)
+    elif body['config'] == 'onlyTheseIng':
+        recipes = subset_search(pantry)
+    else:
+        query = query + " " + " ".join(pantry)
+        recipes = boolean_search([]) 
 
     # recipes = subset_search(pantry)
     
