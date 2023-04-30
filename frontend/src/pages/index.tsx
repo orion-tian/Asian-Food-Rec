@@ -59,7 +59,7 @@ export default function Home() {
   const { isLoading: isLoadingQuery, data } = useQuery(
     ["recipesQuery", queryDebounced, pantry],
     async () => {
-      return (await searchRecipes(queryDebounced, pantry)).data;
+      return (await searchRecipes(queryDebounced, pantry, sliderValue)).data;
     }
   );
 
@@ -129,7 +129,11 @@ export default function Home() {
     >
       <Modal size="xl" opened={opened} onClose={close} title="Details">
         {/* {recipeData ? <RecipeContent recipe={recipeData} /> : <Loader />} */}
-        {selectedRecipe ? <RecipeContent recipe={selectedRecipe} /> : <Loader />}
+        {selectedRecipe ? (
+          <RecipeContent recipe={selectedRecipe} />
+        ) : (
+          <Loader />
+        )}
       </Modal>
 
       <Container p="lg" size="sm">
@@ -217,8 +221,20 @@ export default function Home() {
             </Group>
           </Stepper.Step>
           <Stepper.Step label="Configuration" description="">
-            <Text>To Be Implemented</Text>
-            <Slider label={null} onChangeEnd={setSliderValue} />
+            {/* <Text>To Be Implemented</Text> */}
+            <Slider
+              value={sliderValue}
+              step={50}
+              min={0}
+              max={100}
+              marks={[
+                { value: 0, label: "Recipes Given Ingredients" },
+                { value: 50, label: "Find me a mix" },
+                { value: 100, label: "Recommend me Recipe" },
+              ]}
+              label={null}
+              onChangeEnd={setSliderValue}
+            />
             <Group position="center" mt="xl">
               <Button
                 variant="default"
