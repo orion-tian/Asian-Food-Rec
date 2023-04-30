@@ -5,7 +5,7 @@ const client = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
 });
 
-export const searchRecipes = (query: string, pantry: string[], config: number) => {
+export const searchRecipes = (query: string, pantry: string[], config: string) => {
   return client.post<FullRecipe[]>(`/recipes`, { query, pantry, config });
 };
 

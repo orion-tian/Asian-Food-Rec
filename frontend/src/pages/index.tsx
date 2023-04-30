@@ -14,6 +14,7 @@ import {
   SimpleGrid,
   Loader,
   Modal,
+  SegmentedControl,
 } from "@mantine/core";
 import { useEffect, useState } from "react";
 import ingredients from "@/data/ingredients.json";
@@ -44,7 +45,17 @@ export default function Home() {
   const [pantry, setPantry] = useState<string[]>([]);
 
   // Misc Slider
-  const [sliderValue, setSliderValue] = useState(50);
+  // const [sliderValue, setSliderValue] = useState<number>(50);
+  const [configValue, setSliderConfig] = useState<string>("mixed");
+  // const handleSliderChange = (value: number) => {
+  //   if (value === 0) {
+  //     setSliderConfig("includesIng");
+  //   } else if (value === 50) {
+  //     setSliderConfig("mixed");
+  //   } else {
+  //     setSliderConfig("onlyTheseIng");
+  //   }
+  // };
 
   // Modal
   const [selectedRecipe, setSelectedRecipe] = useState<
@@ -59,7 +70,7 @@ export default function Home() {
   const { isLoading: isLoadingQuery, data } = useQuery(
     ["recipesQuery", queryDebounced, pantry],
     async () => {
-      return (await searchRecipes(queryDebounced, pantry, sliderValue)).data;
+      return (await searchRecipes(queryDebounced, pantry, configValue)).data;
     }
   );
 
@@ -98,7 +109,7 @@ export default function Home() {
 
   useEffect(() => {
     // make request to a server and update recipes
-  }, [query, sliderValue]);
+  }, [query, configValue]);
 
   return (
     <AppShell
@@ -209,6 +220,26 @@ export default function Home() {
               }}
             />
             <Group position="center" mt="xl">
+              <SegmentedControl
+                value={configValue}
+                data={[
+                  {
+                    label: "All Ingredients Are In Recipe",
+                    value: "includesIng",
+                  },
+                  {
+                    label: "Interested In These Ingredients",
+                    value: "mixed",
+                  },
+                  {
+                    label: "Recipes Only Include These Ingredients",
+                    value: "onlyTheseIng",
+                  },
+                ]}
+                onChange={setSliderConfig}
+              />
+            </Group>
+            <Group position="center" mt="xl">
               <Button
                 variant="default"
                 onClick={() => handleStepChange(active - 1)}
@@ -220,22 +251,23 @@ export default function Home() {
               </Button>
             </Group>
           </Stepper.Step>
-          <Stepper.Step label="Configuration" description="">
-            {/* <Text>To Be Implemented</Text> */}
-            <Slider
+          {/* <Stepper.Step label="Configuration" description=""> */}
+          {/* <Text>To Be Implemented</Text> */}
+          {/* <Slider
               value={sliderValue}
               step={50}
               min={0}
               max={100}
               marks={[
-                { value: 0, label: "Recipes Given Ingredients" },
-                { value: 50, label: "Find me a mix" },
-                { value: 100, label: "Recommend me Recipe" },
+                { value: 0, label: "Only Have These Ingredients" },
+                { value: 50, label: "Interested In These Ingredients" },
+                { value: 100, label: "All Ingredients are In Recipe" },
               ]}
               label={null}
-              onChangeEnd={setSliderValue}
-            />
-            <Group position="center" mt="xl">
+              onChangeEnd={handleSliderChange}
+            /> */}
+
+          {/* <Group position="center" mt="xl">
               <Button
                 variant="default"
                 onClick={() => handleStepChange(active - 1)}
@@ -245,8 +277,8 @@ export default function Home() {
               <Button onClick={() => handleStepChange(active + 1)}>
                 Confirm
               </Button>
-            </Group>
-          </Stepper.Step>
+            </Group> */}
+          {/* </Stepper.Step> */}
           <Stepper.Completed>Enjoy!</Stepper.Completed>
         </Stepper>
       </Container>
