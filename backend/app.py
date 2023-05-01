@@ -6,6 +6,7 @@ from jaccard import jaccard_similarity
 from jaccard import svd_similarity
 from helpers.MySQLDatabaseHandler import MySQLDatabaseHandler
 import ast
+import re
 
 # ROOT_PATH for linking with all your files. 
 # Feel free to use a config.py or settings.py with a global export variable
@@ -262,6 +263,13 @@ def recipes_search():
     indices = svd_similarity(row_nums, ratings, query)
 
     ranked = [recipes[i] for i in indices[0:9]]
+
+    for r in ranked:
+        name = r['name']
+        r_id = r['id']
+        kebab_name = re.sub("\s+", "-", name)
+        food_url = f"""https://www.food.com/recipe/{kebab_name}-{r_id}"""
+        r['food_URL'] = food_url
 
     return json.dumps(ranked)
 
