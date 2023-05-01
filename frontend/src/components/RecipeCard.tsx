@@ -8,6 +8,7 @@ import {
   Group,
   Image,
   Rating,
+  Stack,
   Text,
 } from "@mantine/core";
 
@@ -45,19 +46,21 @@ export default function RecipeCard({ recipe, detailCallback }: Props) {
             Chinese
           </Badge>
         </Group>*/}
-        <Text size="sm" color="dimmed" mt="xs">
-          {description}
-        </Text>
-        <Button
-          variant="light"
-          color="blue"
-          fullWidth
-          radius="md"
-          mt="md"
-          onClick={detailCallback}
-        >
-          See details
-        </Button>
+        <Stack justify="space-between">
+          <Text lineClamp={4} size="sm" color="dimmed" mt="xs">
+            {description}
+          </Text>
+          <Button
+            variant="light"
+            color="blue"
+            fullWidth
+            radius="md"
+            mt="md"
+            onClick={detailCallback}
+          >
+            See details
+          </Button>
+        </Stack>
       </Card>
     </Box>
   );

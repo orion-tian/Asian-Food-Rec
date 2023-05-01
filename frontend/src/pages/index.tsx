@@ -225,9 +225,9 @@ export default function Home() {
               >
                 Back
               </Button>
-              <Button onClick={() => handleStepChange(active + 1)}>
+              {/* <Button onClick={() => handleStepChange(active + 1)}>
                 {pantry.length ? "Next" : "Skip"}
-              </Button>
+              </Button> */}
             </Group>
           </Stepper.Step>
           {/* <Stepper.Step label="Configuration" description=""> */}
@@ -267,13 +267,18 @@ export default function Home() {
         </Center>
         <Center mt="md">{isLoadingQuery && <Loader />}</Center>
         <Center mt="md">
-          {(data && !data.length) && (
-            <Text>
-              Found 0 recipes given your search criteria.
-            </Text>
+          {data && !data.length && (
+            <Text>Found 0 recipes given your search criteria.</Text>
           )}
         </Center>
-        <SimpleGrid cols={3} mt="md">
+        <SimpleGrid
+          breakpoints={[
+            { minWidth: "sm", cols: 1 },
+            { minWidth: "md", cols: 2 },
+            { minWidth: 1200, cols: 3 },
+          ]}
+          mt="md"
+        >
           {data?.map((recipe) => (
             <RecipeCard
               key={recipe.name}
