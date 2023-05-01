@@ -17,4 +17,5 @@ export type FullRecipe = BaseRecipe & {
   ingredients: string[];
   steps: string[];
   user_data: UserReview[];
+  food_URL: string;
 };

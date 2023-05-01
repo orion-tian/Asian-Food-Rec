@@ -80,6 +80,7 @@ export default function Home() {
           "https://thewoksoflife.com/wp-content/uploads/2019/06/mapo-tofu-10.jpg",
         avg_rating: 4.5,
         user_data: [],
+        food_URL: "food.com",
       };
       return placeholder;
       // if (selectedId) {
@@ -266,17 +267,25 @@ export default function Home() {
         </Center>
         <Center mt="md">{isLoadingQuery && <Loader />}</Center>
         <SimpleGrid cols={3} mt="md">
-          {data?.slice(0, 9).map((recipe) => (
-            <RecipeCard
-              key={recipe.name}
-              recipe={recipe}
-              detailCallback={() => {
-                setSelectedId(recipe.id);
-                setSelectedRecipe(recipe);
-                open();
-              }}
-            />
-          ))}
+          {data?.length === 0 ? (
+            <Group position="center" mt="xl">
+              <Input.Label>
+                Found 0 recipes given your search criteria.
+              </Input.Label>
+            </Group>
+          ) : (
+            data?.slice(0, 9).map((recipe) => (
+              <RecipeCard
+                key={recipe.name}
+                recipe={recipe}
+                detailCallback={() => {
+                  setSelectedId(recipe.id);
+                  setSelectedRecipe(recipe);
+                  open();
+                }}
+              />
+            ))
+          )}
         </SimpleGrid>
       </Container>
     </AppShell>

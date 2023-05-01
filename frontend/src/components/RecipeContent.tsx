@@ -23,8 +23,16 @@ interface Props {
 }
 
 export default function RecipeContent({ recipe }: Props) {
-  const { name, description, minutes, ingredients, steps, tags, user_data } =
-    recipe;
+  const {
+    name,
+    description,
+    minutes,
+    ingredients,
+    steps,
+    tags,
+    user_data,
+    food_URL,
+  } = recipe;
   return (
     <Container mb="md">
       <Box>
@@ -57,6 +65,8 @@ export default function RecipeContent({ recipe }: Props) {
             return <List.Item key={i}>{step}</List.Item>;
           })}
         </List>
+        <Title order={3}>Food.com URL</Title>
+        <Text>{food_URL}</Text>
         {user_data.length && (
           <>
             <Title order={3}>Reviews</Title>
