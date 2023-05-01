@@ -266,26 +266,25 @@ export default function Home() {
           <Title order={2}>Recipes</Title>
         </Center>
         <Center mt="md">{isLoadingQuery && <Loader />}</Center>
-        <SimpleGrid cols={3} mt="md">
-          {data?.length === 0 ? (
-            <Group position="center" mt="xl">
-              <Input.Label>
-                Found 0 recipes given your search criteria.
-              </Input.Label>
-            </Group>
-          ) : (
-            data?.slice(0, 9).map((recipe) => (
-              <RecipeCard
-                key={recipe.name}
-                recipe={recipe}
-                detailCallback={() => {
-                  setSelectedId(recipe.id);
-                  setSelectedRecipe(recipe);
-                  open();
-                }}
-              />
-            ))
+        <Center mt="md">
+          {(data && !data.length) && (
+            <Text>
+              Found 0 recipes given your search criteria.
+            </Text>
           )}
+        </Center>
+        <SimpleGrid cols={3} mt="md">
+          {data?.map((recipe) => (
+            <RecipeCard
+              key={recipe.name}
+              recipe={recipe}
+              detailCallback={() => {
+                setSelectedId(recipe.id);
+                setSelectedRecipe(recipe);
+                open();
+              }}
+            />
+          ))}
         </SimpleGrid>
       </Container>
     </AppShell>
