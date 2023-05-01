@@ -46,17 +46,7 @@ export default function Home() {
   const [pantry, setPantry] = useState<string[]>([]);
 
   // Misc Slider
-  // const [sliderValue, setSliderValue] = useState<number>(50);
   const [configValue, setSliderConfig] = useState<string>("mixed");
-  // const handleSliderChange = (value: number) => {
-  //   if (value === 0) {
-  //     setSliderConfig("includesIng");
-  //   } else if (value === 50) {
-  //     setSliderConfig("mixed");
-  //   } else {
-  //     setSliderConfig("onlyTheseIng");
-  //   }
-  // };
 
   // Modal
   const [selectedRecipe, setSelectedRecipe] = useState<
@@ -69,7 +59,7 @@ export default function Home() {
 
   // Data Fetching
   const { isLoading: isLoadingQuery, data } = useQuery(
-    ["recipesQuery", queryDebounced, pantry],
+    ["recipesQuery", queryDebounced, pantry, configValue],
     async () => {
       return (await searchRecipes(queryDebounced, pantry, configValue)).data;
     }
@@ -97,20 +87,6 @@ export default function Home() {
       // }
     }
   );
-
-  // const data = [
-  //   {
-  //     name: "Mapo Tofu",
-  //     imageSrc:
-  //       "https://thewoksoflife.com/wp-content/uploads/2019/06/mapo-tofu-10.jpg",
-  //     description:
-  //       "Mapo Tofu is a spicy Sichuan dish made with soft tofu and ground pork in a sauce of chili bean paste and Sichuan peppercorns.",
-  //   },
-  // ];
-
-  useEffect(() => {
-    // make request to a server and update recipes
-  }, [query, configValue]);
 
   return (
     <AppShell
