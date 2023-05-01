@@ -65,8 +65,10 @@ export default function RecipeContent({ recipe }: Props) {
             return <List.Item key={i}>{step}</List.Item>;
           })}
         </List>
-        <Title order={3}>Food.com URL</Title>
-        <Text>{food_URL}</Text>
+        <Title order={3}>Full Recipe</Title>
+        <Text rel="noopener noreferrer" target="_blank" td="underline" c="blue" component="a" href={food_URL}>
+          Link to Recipe
+        </Text>
         {user_data.length && (
           <>
             <Title order={3}>Reviews</Title>
