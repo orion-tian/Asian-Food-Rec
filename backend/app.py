@@ -157,12 +157,12 @@ def boolean_search(ingred_lst):
     if len(posting_set) > 0:
         return get_recipes_from_postings(posting_set)
     else:
-        return boolean_search([])
+        return []
 
 def subset_search(ingred_lst):
     mysql_engine.query_selector(f"""USE recipes""")
     if len(ingred_lst) == 0:
-        return boolean_search(ingred_lst)
+        return []
     if len(ingred_lst) == 1:
         query_sql = f"""SELECT DISTINCT ingredient from inverted_index WHERE ingredient NOT IN ('{ingred_lst[0]}')"""
     else:
@@ -187,7 +187,7 @@ def subset_search(ingred_lst):
     if len(diff) > 0:
         return get_recipes_from_postings(diff)
     else:
-        return boolean_search(ingred_lst)
+        return []
 
 def sql_recipe_search(ingred_lst_str):
     ingred_lst = []
@@ -231,6 +231,9 @@ def recipes_search():
         query = query + " " + " ".join(pantry)
         recipes = boolean_search([]) 
 
+    if len(recipes) == 0:
+        return json.dumps([])
+    
     # recipes = subset_search(pantry)
     
     # descriptions = []
