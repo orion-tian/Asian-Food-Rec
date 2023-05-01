@@ -121,7 +121,7 @@ def get_recipes_from_postings(result_postings):
                 r_d.update({'avg_rating': d['avg_rating'], 'user_data': d['user_data']})
                 break
 
-    return results[1:]
+    return results
 
 # returns postings that contain any of the ingredients in ingredients list
 def get_postings_containing_ingredients(ingredient_lst):
