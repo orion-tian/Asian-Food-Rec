@@ -245,6 +245,12 @@ def recipes_search():
     #     except:
     #         descriptions.append(str(recipe['name']) + str(recipe['description']) 
     #                 + str(recipe['steps']))
+    reviews = []
+    for recipe in recipes:
+        try: 
+            reviews.append(str([d['review'] for d in recipe['user_data']]))
+        except:
+            reviews.append("")
 
     ratings = []
     for recipe in recipes:
@@ -260,7 +266,7 @@ def recipes_search():
     for recipe in recipes:
         row_nums.append(recipe['row_no'])
 
-    indices = svd_similarity(row_nums, ratings, query)
+    indices = svd_similarity(row_nums, ratings, reviews, query)
 
     ranked = [recipes[i] for i in indices[0:9]]
 

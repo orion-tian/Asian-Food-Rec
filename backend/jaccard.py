@@ -43,11 +43,12 @@ def jaccard_similarity(descriptions, ratings, query):
 
   return ranked_indices
 
-def svd_similarity(recipe_rows, ratings, query, k=15):
+def svd_similarity(recipe_rows, ratings, reviews, query, k=15):
   """ demo svd code based on index of recipe, so use recipe's rows, 
     k = how many results to return """
 
   ratings_weight = 0.05
+  reviews_weight = 0.5
   svd_weight = 1.0
 
   if query == "":
@@ -61,7 +62,19 @@ def svd_similarity(recipe_rows, ratings, query, k=15):
   
   svd_scores = np.array([svd_weight*sims[r] for r in recipe_rows])
   rating_scores = np.array([ratings_weight*ratings[i] for i in range(len(recipe_rows))])
-  scores = np.add(svd_scores, rating_scores)
+
+  query_words = set(tokenize(query))
+  similarities = []
+  for review in reviews:
+      recipe_words = set(tokenize(review))
+      intersection = len(query_words.intersection(recipe_words))
+      union = len(query_words.union(recipe_words))
+      similarity = intersection / (union+1)
+      similarities.append(similarity)
+  
+  review_scores = np.array([reviews_weight*similarities[i] for i in range(len(similarities))])
+
+  scores = np.add(svd_scores, rating_scores, review_scores)
   
   asort = np.argsort(-scores)[:k+1]
 
