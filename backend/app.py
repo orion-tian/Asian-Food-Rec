@@ -7,6 +7,7 @@ from jaccard import svd_similarity
 from helpers.MySQLDatabaseHandler import MySQLDatabaseHandler
 import ast
 import re
+import time
 
 # ROOT_PATH for linking with all your files. 
 # Feel free to use a config.py or settings.py with a global export variable
@@ -29,7 +30,8 @@ app = Flask(__name__, static_url_path='/', static_folder="frontend-build")
 CORS(app)
 app.config['CORS_HEADERS'] = 'Content-Type'
 
-_keys = ['name', 'row_no', 'id', 'minutes', 'tags', 'nutrition', 'steps', 'description', 'ingredients', 'img_link']
+_full_keys = ['name', 'row_no', 'id', 'minutes', 'tags', 'nutrition', 'steps', 'description', 'ingredients', 'img_link', 'avg_rating', 'user_data']
+_abridged_keys = ['row_no', 'id', 'avg_rating', 'user_data']
 _keys_user_data = ['recipe_id', 'rating', 'review']
 
 def get_postings_from_data(data):
@@ -82,19 +84,19 @@ def get_user_data_from_postings(result_postings):
 
     return results
 
-def get_recipes_from_postings(result_postings):
+def get_abridged_recipes_from_postings(result_postings):
     if len(result_postings) == 0:
         return []
     postings_str = get_sql_tuple_from_postings(result_postings)
     mysql_engine.query_selector(f"""USE recipes""")
-    query_sql = f"""WITH ings AS (
-                        SELECT inverted_index.id, CONCAT("[", group_concat(QUOTE(inverted_index.ingredient)), "]") AS ingredients 
-                        FROM inverted_index GROUP BY inverted_index.id
+    query_sql = f"""WITH review_data AS (
+                        SELECT user_data.recipe_id, AVG(user_data.rating) AS avg_rating, group_concat(user_data.review) AS user_data
+                        FROM user_data GROUP BY user_data.recipe_id
                     )
-                    SELECT name, row_no, mytable.id, minutes, tags, nutrition, steps, description, ings.ingredients, img_link
+                    SELECT row_no, mytable.id, avg_rating, user_data
                     FROM mytable 
-                    INNER JOIN ings
-                    ON mytable.id = ings.id
+                    INNER JOIN review_data
+                    ON mytable.id = review_data.recipe_id
                     WHERE mytable.id IN {postings_str}""" 
     
     data = mysql_engine.query_selector(query_sql)
@@ -102,7 +104,51 @@ def get_recipes_from_postings(result_postings):
     results = []
     for row in data:
         values = []
-        for key in _keys:
+        for key in _abridged_keys:
+            try:
+                values.append(ast.literal_eval(str(row[key])))
+            except:
+                values.append(row[key])
+        results.append(dict(zip(_abridged_keys, values)))
+
+    # add user_data
+    # user_data = get_user_data_from_postings(result_postings)
+    # for d in user_data:
+    #     recipe_id = d['recipe_id']
+    #     for r_d in results:
+    #         if recipe_id == r_d['id']:
+    #             r_d.update({'avg_rating': d['avg_rating'], 'user_data': d['user_data']})
+    #             break
+
+    return results
+
+def get_full_recipes_from_postings(result_postings):
+    if len(result_postings) == 0:
+        return []
+    postings_str = get_sql_tuple_from_postings(result_postings)
+    mysql_engine.query_selector(f"""USE recipes""")
+    query_sql = f"""WITH ings AS (
+                        SELECT inverted_index.id, CONCAT("[", group_concat(QUOTE(inverted_index.ingredient)), "]") AS ingredients 
+                        FROM inverted_index GROUP BY inverted_index.id
+                    ),
+                    review_data AS (
+                        SELECT user_data.recipe_id, AVG(user_data.rating) AS avg_rating, CONCAT("[", group_concat(CONCAT("{{", "\\"rating\\"", ":", user_data.rating, ",", "\\"review\\"", ":", QUOTE(user_data.review), "}}")), "]") AS user_data
+                        FROM user_data GROUP BY user_data.recipe_id
+                    )
+                    SELECT name, row_no, mytable.id, minutes, tags, nutrition, steps, description, ings.ingredients, img_link, avg_rating, user_data
+                    FROM mytable 
+                    INNER JOIN ings
+                    ON mytable.id = ings.id
+                    INNER JOIN review_data
+                    ON mytable.id = review_data.recipe_id
+                    WHERE mytable.id IN {postings_str}""" 
+    
+    data = mysql_engine.query_selector(query_sql)
+    
+    results = []
+    for row in data:
+        values = []
+        for key in _full_keys:
             try:
                 if key == "img_link":
                     values.append(str(row[key]).replace("%%", "%"))
@@ -110,16 +156,16 @@ def get_recipes_from_postings(result_postings):
                     values.append(ast.literal_eval(str(row[key])))
             except:
                 values.append(row[key])
-        results.append(dict(zip(_keys, values)))
+        results.append(dict(zip(_full_keys, values)))
 
     # add user_data
-    user_data = get_user_data_from_postings(result_postings)
-    for d in user_data:
-        recipe_id = d['recipe_id']
-        for r_d in results:
-            if recipe_id == r_d['id']:
-                r_d.update({'avg_rating': d['avg_rating'], 'user_data': d['user_data']})
-                break
+    # user_data = get_user_data_from_postings(result_postings)
+    # for d in user_data:
+    #     recipe_id = d['recipe_id']
+    #     for r_d in results:
+    #         if recipe_id == r_d['id']:
+    #             r_d.update({'avg_rating': d['avg_rating'], 'user_data': d['user_data']})
+    #             break
 
     return results
 
@@ -149,14 +195,14 @@ def boolean_search(ingred_lst):
     posting_set = set()
     if len(ingred_lst) == 0:
         mysql_engine.query_selector(f"""USE recipes""")
-        query_sql = f"""SELECT id FROM mytable LIMIT 1000""" 
+        query_sql = f"""SELECT id FROM mytable""" 
         data = mysql_engine.query_selector(query_sql)
         posting_set = get_postings_from_data(data)
     else:
         posting_set = get_postings_containing_all_ingredients(ingred_lst)
 
     if len(posting_set) > 0:
-        return get_recipes_from_postings(posting_set)
+        return get_abridged_recipes_from_postings(posting_set)
     else:
         return []
 
@@ -186,7 +232,7 @@ def subset_search(ingred_lst):
     diff = all_posting_set.difference(not_ingred_postings)
     
     if len(diff) > 0:
-        return get_recipes_from_postings(diff)
+        return get_abridged_recipes_from_postings(diff)
     else:
         return []
 
@@ -223,7 +269,6 @@ def recipes_search():
     pantry = body['pantry']  # string list - this is the list of ingredients
 
     # Output is a list of dicts on information about each recipe (jsonified)
-    
     if body['config'] == 'includesIng':
         recipes = boolean_search(pantry)
     elif body['config'] == 'onlyTheseIng':
@@ -248,10 +293,9 @@ def recipes_search():
     reviews = []
     for recipe in recipes:
         try: 
-            reviews.append(str([d['review'] for d in recipe['user_data']]))
+            reviews.append(str(recipe['user_data']))
         except:
             reviews.append("")
-
     ratings = []
     for recipe in recipes:
         try: 
@@ -268,7 +312,16 @@ def recipes_search():
 
     indices = svd_similarity(row_nums, ratings, reviews, query)
 
-    ranked = [recipes[i] for i in indices[0:9]]
+    top_postings = [recipes[i]['id'] for i in indices[0:9]]
+
+    top_ranked = get_full_recipes_from_postings(top_postings)
+
+    ranked = []
+
+    for i in top_postings:
+        for r in top_ranked:
+            if i == r['id']:
+                ranked.append(r)
 
     for r in ranked:
         name = r['name']
@@ -276,12 +329,12 @@ def recipes_search():
         kebab_name = re.sub("\s+", "-", name)
         food_url = f"""https://www.food.com/recipe/{kebab_name}-{r_id}"""
         r['food_URL'] = food_url
-
+        
     return json.dumps(ranked)
 
 @app.route("/recipes/<int:id>")
 def recipes(id):
-    recipe = get_recipes_from_postings([0, id])
+    recipe = get_full_recipes_from_postings([0, id])
     if len(recipe) == 1:
         return json.dumps(recipe[0])
     else:
