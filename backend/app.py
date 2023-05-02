@@ -155,9 +155,11 @@ def get_full_recipes_from_postings(result_postings):
                 else:
                     values.append(ast.literal_eval(str(row[key])))
             except:
-                values.append(row[key])
+                if key == "user_data":
+                    values.append([])
+                else:
+                    values.append(row[key])
         results.append(dict(zip(_full_keys, values)))
-
     # add user_data
     # user_data = get_user_data_from_postings(result_postings)
     # for d in user_data:
@@ -329,7 +331,7 @@ def recipes_search():
         kebab_name = re.sub("\s+", "-", name)
         food_url = f"""https://www.food.com/recipe/{kebab_name}-{r_id}"""
         r['food_URL'] = food_url
-        
+
     return json.dumps(ranked)
 
 @app.route("/recipes/<int:id>")
