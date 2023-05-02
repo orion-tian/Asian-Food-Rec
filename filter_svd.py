@@ -22,8 +22,7 @@ for index, row in df_recipes.iterrows():
   reviews = ""
   for review in reviews_ser:
      reviews += str(review)
-  documents.append((row["name"], row["tags"], 
-                    row["steps"], row["description"], reviews))
+  documents.append((row["name"], str(row["tags"]), str(row["tags"])+row['name']+str(row["steps"])+str(row["description"]), reviews))
 
 # np.random.shuffle(documents)
 
@@ -161,12 +160,12 @@ df_docs = pd.DataFrame(docs_compressed_normed)
 df_words.to_csv('compressed_words.csv', index=False)
 df_docs.to_csv('compressed_docs.csv', index=False)
 
-# with open('compressed_words.pickle', 'wb') as f:
-#     pickle.dump(words_compressed_normed, f)
-# with open('compressed_docs.pickle', 'wb') as f:
-#     pickle.dump(docs_compressed_normed, f)
-# with open('documents.pickle', 'wb') as f:
-#     pickle.dump(documents, f)
+with open('compressed_words.pickle', 'wb') as f:
+    pickle.dump(words_compressed_normed, f)
+with open('compressed_docs.pickle', 'wb') as f:
+    pickle.dump(docs_compressed_normed, f)
+with open('documents.pickle', 'wb') as f:
+    pickle.dump(documents, f)
 
 """CREATE TABLE `compr_words` (
   `0` float(18,17) NOT NULL,
