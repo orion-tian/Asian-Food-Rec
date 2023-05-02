@@ -48,7 +48,7 @@ def svd_similarity(recipe_rows, ratings, reviews, query, k=15):
     k = how many results to return """
 
   ratings_weight = 0.05
-  reviews_weight = 0.5
+  reviews_weight = 1.0
   svd_weight = 1.0
 
   if query == "":
@@ -74,7 +74,8 @@ def svd_similarity(recipe_rows, ratings, reviews, query, k=15):
   
   review_scores = np.array([reviews_weight*similarities[i] for i in range(len(similarities))])
 
-  scores = np.add(svd_scores, rating_scores, review_scores)
+  scores = np.add(svd_scores, rating_scores)
+  scores = np.add(scores, review_scores)
   
   asort = np.argsort(-scores)[:k+1]
 
