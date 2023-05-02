@@ -59,7 +59,7 @@ def get_user_data_from_postings(result_postings):
             except:
                 values.append(row[key])
         intermedi.append(dict(zip(_keys_user_data, values)))
-    intermedi = intermedi[1:]
+    # intermedi = intermedi[1:]
 
    # combine user data of same recipe together into
    # [{recipe_id:x, user_data:[{rating:x, review:x}, {}]}, {},...]
@@ -179,7 +179,7 @@ def subset_search(ingred_lst):
     data = mysql_engine.query_selector(query_sql)
     
     all_posting_set = get_postings_from_data(data)
-    all_posting_set.remove(0)
+    # all_posting_set.remove(0)
 
     not_ingred_postings = get_postings_containing_ingredients(not_ingred_lst)
 

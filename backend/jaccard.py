@@ -52,7 +52,7 @@ def svd_similarity(recipe_rows, ratings, reviews, query, k=15):
   svd_weight = 1.0
 
   if query == "":
-    return [i for i in range(k+1)]
+    return [i for i in range(len(recipe_rows))]
 
   query_tfidf = vectorizer.transform([query]).toarray()
   
