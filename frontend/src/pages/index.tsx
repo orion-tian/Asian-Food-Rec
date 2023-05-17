@@ -126,140 +126,55 @@ export default function Home() {
       </Modal>
 
       <Container p="lg" size="sm">
-        {/* <Center h={100}>
-          <Title order={1}>Asian Food</Title>
-        </Center> */}
-        <Stepper active={active} onStepClick={setActive} breakpoint="sm">
-          <Stepper.Step label="Query" description="">
-            {/* <Text>
-              Your pantry includes:{" "}
-              {pantry.length ? pantry.join(", ") : "nothing..."}{" "}
-            </Text> */}
-            <TextInput
-              value={queryInput}
-              onChange={(event) => setQueryInput(event.currentTarget.value)}
-              label="What's on your mind?"
-              placeholder="chicken, spicy, stir fry, with rice, high fiber"
-              withAsterisk
-            />
-            {/* <MultiSelect
-              data={[]}
-              onChange={setQuery}
-              label="What's on your mind?"
-              placeholder="chicken, spicy, stir fry, with rice, high fiber"
-              searchable
-              creatable
-              getCreateLabel={(item) => `${item}`}
-              onCreate={(item) => {
-                setQuery((current) => [...current, item]);
-                return item;
-              }}
-              transitionProps={{
-                duration: 150,
-                transition: "pop-top-left",
-                timingFunction: "ease",
-              }}
-            /> */}
-            <Group position="center" mt="xl">
-              <Button
-                disabled
-                variant="default"
-                onClick={() => handleStepChange(active - 1)}
-              >
-                Back
-              </Button>
-              <Button
-                disabled={!queryInput}
-                onClick={() => handleStepChange(active + 1)}
-              >
-                Next
-              </Button>
-            </Group>
-          </Stepper.Step>
-          <Stepper.Step label="Pantry">
-            <MultiSelect
-              value={pantry}
-              onChange={setPantry}
-              data={ingredients}
-              label="What's in your pantry?"
-              placeholder="no need for exact matches!"
-              limit={20}
-              maxDropdownHeight={160}
-              searchable
-              creatable
-              onCreate={(newItem) => {
-                setPantry((current) => [...current, newItem]);
-                return newItem;
-              }}
-              transitionProps={{
-                duration: 150,
-                transition: "pop-top-left",
-                timingFunction: "ease",
-              }}
-            />
-            <Group position="left" mt="xl">
-              <Input.Label>How should we use your pantry?</Input.Label>
-            </Group>
-            <SegmentedControl
-              value={configValue}
-              data={[
-                {
-                  label: "Incorporate All",
-                  value: "includesIng",
-                },
-                {
-                  label: "Interested In",
-                  value: "mixed",
-                },
-                {
-                  label: "Only Include",
-                  value: "onlyTheseIng",
-                },
-              ]}
-              onChange={setSliderConfig}
-            />
-            <Group position="center" mt="xl">
-              <Button
-                variant="default"
-                onClick={() => handleStepChange(active - 1)}
-              >
-                Back
-              </Button>
-              {/* <Button onClick={() => handleStepChange(active + 1)}>
-                {pantry.length ? "Next" : "Skip"}
-              </Button> */}
-            </Group>
-          </Stepper.Step>
-          {/* <Stepper.Step label="Configuration" description=""> */}
-          {/* <Text>To Be Implemented</Text> */}
-          {/* <Slider
-              value={sliderValue}
-              step={50}
-              min={0}
-              max={100}
-              marks={[
-                { value: 0, label: "Only Have These Ingredients" },
-                { value: 50, label: "Interested In These Ingredients" },
-                { value: 100, label: "All Ingredients are In Recipe" },
-              ]}
-              label={null}
-              onChangeEnd={handleSliderChange}
-            /> */}
-
-          {/* <Group position="center" mt="xl">
-              <Button
-                variant="default"
-                onClick={() => handleStepChange(active - 1)}
-              >
-                Back
-              </Button>
-              <Button onClick={() => handleStepChange(active + 1)}>
-                Confirm
-              </Button>
-            </Group> */}
-          {/* </Stepper.Step> */}
-          <Stepper.Completed>Enjoy!</Stepper.Completed>
-        </Stepper>
+        <TextInput
+          value={queryInput}
+          onChange={(event) => setQueryInput(event.currentTarget.value)}
+          label="What's on your mind?"
+          placeholder="chicken, spicy, stir fry, with rice, high fiber"
+          withAsterisk
+          mb="xl"
+        />
+        <MultiSelect
+          value={pantry}
+          onChange={setPantry}
+          data={ingredients}
+          label="What's in your pantry?"
+          placeholder="no need for exact matches!"
+          limit={20}
+          maxDropdownHeight={160}
+          searchable
+          creatable
+          onCreate={(newItem) => {
+            setPantry((current) => [...current, newItem]);
+            return newItem;
+          }}
+          transitionProps={{
+            duration: 150,
+            transition: "pop-top-left",
+            timingFunction: "ease",
+          }}
+        />
+        <Group position="left" mt="xl">
+          <Input.Label>How should we use your pantry?</Input.Label>
+        </Group>
+        <SegmentedControl
+          value={configValue}
+          data={[
+            {
+              label: "Incorporate All",
+              value: "includesIng",
+            },
+            {
+              label: "Interested In",
+              value: "mixed",
+            },
+            {
+              label: "Only Include",
+              value: "onlyTheseIng",
+            },
+          ]}
+          onChange={setSliderConfig}
+        />
       </Container>
       <Container p="lg" size="lg">
         <Center>
