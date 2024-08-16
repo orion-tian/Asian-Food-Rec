@@ -1,3 +1,46 @@
+# Asian Recipe Search Engine
+Project Link: http://4300showcase.infosci.cornell.edu:4524/
+
+Asian Recipe search engine returns Asian recipes from a database to best match the ingredients you have in the fridge, your preferences such as type of cuisine or healthy meal, and the recipe ratings given by other users. We wanted to create this engine to allow users to explore Asian receipes they might not have known and also find meals they can make using only the ingredients they currently have so they can start cooking as soon as possible. The recipes are taken from a kaggle dataset of food.com recipes where we filtered out the asian ones to include in our database: https://www.kaggle.com/datasets/shuyangli94/food-com-recipes-and-user-interactions
+
+![Screenshot 2024-08-16 at 6 17 10 PM](https://github.com/user-attachments/assets/e4cc124e-0fd9-4344-933f-daa703e9b8d1)
+
+The top field is where you can input your preferences for the returned recipes such as a meal including chicken, a spicy dish, or a stir-fry meal. The next field is where you can enter in ingredients you have along with three options for how those ingredients will be considered by the engine. The "Incorporate All" option means the recipes returned must include all given ingredients but can include ones that are not given. The "Interested In" options means the ingredients are a loose guideline and user preference is prioritized more. The "Only Include" option returns recipes that only include the given ingredients and nothing else. 
+
+## Examples 
+
+If you input spicy, the engine will give you spicy dishes to make: 
+
+![Screenshot 2024-08-16 at 6 18 56 PM](https://github.com/user-attachments/assets/e37068b0-9488-4f75-b140-55e36c953035)
+![Screenshot 2024-08-16 at 6 33 41 PM](https://github.com/user-attachments/assets/ee49e37f-2adc-46aa-ae25-ccee70e12864)
+
+When we enter in cucumbers along with simple staples like oil, salt, and soy sauce, the recipes returned are simple cucumber dishes: 
+
+![Screenshot 2024-08-16 at 6 21 35 PM](https://github.com/user-attachments/assets/7dbb61fe-b89c-410d-9a58-fd9b8e033181)
+
+If we select the "Only Include" option, we see that now we only get two recipes since these are the only two that include only the given ingredients:
+
+![Screenshot 2024-08-16 at 6 23 34 PM](https://github.com/user-attachments/assets/0330d977-0096-42ae-a395-9c17da03539a)
+
+We can confirm this by clking "See details", where we can see the ingredients list of the recipe along with other helpful info like cooking time, tags associated with the recipe, its description, cooking steps, link to full recipe on food.com, and reviews by users:
+
+![Screenshot 2024-08-16 at 6 24 09 PM](https://github.com/user-attachments/assets/8b02f993-d276-4a01-936a-487edb38794e)
+
+When we input both preferences and ingredients under the "Interested In" option, user preference is prioritized more as the top recipes returned are more easy and fast like grilling chicken and stir fry:
+
+![Screenshot 2024-08-16 at 6 25 38 PM](https://github.com/user-attachments/assets/fab0adf5-3000-47e2-9090-4ef7d0790568)
+
+When we change to the "Incorporate All" option, we then get dishes that include both chicken breasts and rice noodles as the top results: 
+
+![Screenshot 2024-08-16 at 6 31 38 PM](https://github.com/user-attachments/assets/be64023b-50c0-430b-9491-7524af4f12e6)
+
+And if we look at the "Only Include" option, we find that there are no recipes that only have chicken breasts and rice noodles: 
+
+![Screenshot 2024-08-16 at 6 32 26 PM](https://github.com/user-attachments/assets/53072b85-1177-427b-a5af-8eb826b7ed96)
+
+
+____________________________________________________________________________________________________________________________________________________________________________________
+
 # 4300-Flask-Template
 
 ## Contents
